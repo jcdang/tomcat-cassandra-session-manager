@@ -1,4 +1,4 @@
-package io.mycompany.tomcat;
+package io.dang.tomcat;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

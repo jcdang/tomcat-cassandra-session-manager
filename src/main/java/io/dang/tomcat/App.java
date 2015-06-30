@@ -1,4 +1,4 @@
-package io.mycompany.tomcat;
+package io.dang.tomcat;
 
 /**
  * Hello world!
