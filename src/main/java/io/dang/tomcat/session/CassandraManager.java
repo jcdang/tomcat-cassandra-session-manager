@@ -10,9 +10,6 @@ import org.apache.catalina.session.PersistentManagerBase;
 public class CassandraManager extends PersistentManagerBase {
     protected static final String NAME = "CassandraManager";
 
-
-
-
     protected String clusterName;
     protected String keyspace;
     protected String tableName;

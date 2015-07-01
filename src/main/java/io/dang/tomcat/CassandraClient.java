@@ -4,6 +4,11 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 
 public class CassandraClient {
+
+    protected final String REPLICATION = "WITH REPLICATION = {'class': 'SimpleStrategy', 'replication_factor': 1};";
+    protected final String KEYSPACE_EXISTS_CQL = "SELECT * FROM SYSTEM.SCHEMA_KEYSPACES WHERE KEYSPACE_NAME = ?";
+    protected final String CREATE_KEYSPACE_CQL = "CREATE KEYSPACE %s " + REPLICATION;
+
     private Cluster cluster;
     private Session session;
     private String clusterName;
