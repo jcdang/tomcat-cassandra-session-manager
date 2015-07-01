@@ -6,7 +6,11 @@ import com.datastax.driver.core.Session;
 public class CassandraClient {
     private Cluster cluster;
     private Session session;
+    private String clusterName;
 
+    public CassandraClient(String clusterName) {
+        this.clusterName = clusterName;
+    }
 
     public void connect(String nodes) {
         if (nodes != null) {
@@ -14,7 +18,10 @@ public class CassandraClient {
         }
     }
     public void connect(String[] nodes) {
-        cluster = Cluster.builder().addContactPoints(nodes).build();
+        cluster = Cluster.builder()
+                .withClusterName(clusterName)
+                .addContactPoints(nodes)
+                .build();
         session = cluster.connect();
     }
 
