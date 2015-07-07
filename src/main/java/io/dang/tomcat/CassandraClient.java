@@ -24,7 +24,7 @@ public class CassandraClient {
             "    gc_grace_seconds = 86400 AND " +
             "    compaction = {'class':'LeveledCompactionStrategy'};";
     protected final String UPSERT_TO_SESSION_TABLE_CQL =
-            "UPDATE %s USING TTL ? " +
+            "INSERT %s USING TTL ? " +
             "SET " +
             "   app_name = ? " +
             "   valid_session = ? " +

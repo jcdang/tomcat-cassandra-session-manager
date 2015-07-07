@@ -3,11 +3,17 @@ package io.dang.tomcat.session;
 import com.datastax.driver.core.utils.UUIDs;
 import org.apache.catalina.Session;
 import org.apache.catalina.session.PersistentManagerBase;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
+import java.io.IOException;
 
 /**
  * https://tomcat.apache.org/tomcat-8.0-doc/config/manager.html
  */
 public class CassandraManager extends PersistentManagerBase {
+    private final Log log = LogFactory.getLog(CassandraManager.class);
+
     protected static final String NAME = "CassandraManager";
 
     protected String clusterName;
@@ -32,6 +38,17 @@ public class CassandraManager extends PersistentManagerBase {
     @Override
     public String generateSessionId() {
         return UUIDs.timeBased().toString();
+    }
+
+    @Override
+    public Session findSession(String sessionId) throws IOException {
+        Session session = super.findSession(sessionId);
+
+        if (session != null) {
+            log.debug("Found cached Session for id = {}" + sessionId);
+            return session;
+        }
+        return null; // TODO
     }
 
     public String getClusterName() {
