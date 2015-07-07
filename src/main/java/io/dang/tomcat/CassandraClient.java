@@ -1,6 +1,7 @@
 package io.dang.tomcat;
 
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 
 public class CassandraClient {
@@ -39,5 +40,17 @@ public class CassandraClient {
         if (cluster != null) {
             cluster.close();
         }
+    }
+
+    public boolean isKeyspaceCreated(String keyspaceName) {
+        ResultSet rs = session.execute(KEYSPACE_EXISTS_CQL, keyspaceName);
+        return rs.one() != null;
+    }
+
+    public void doCreateKeyspace(String keyspaceName) {
+        if (isKeyspaceCreated(keyspaceName))
+            return;
+
+        session.execute(String.format(CREATE_KEYSPACE_CQL, keyspaceName));
     }
 }
