@@ -2,6 +2,7 @@ package io.dang.tomcat;
 
 import org.apache.cassandra.config.Config;
 import org.apache.cassandra.exceptions.ConfigurationException;
+import org.apache.cassandra.net.MessagingService;
 import org.apache.thrift.transport.TTransportException;
 import org.cassandraunit.utils.EmbeddedCassandraServerHelper;
 import org.testng.annotations.AfterMethod;
@@ -34,7 +35,7 @@ public class AppTest {
 
     @Test
     public void clientTest() {
-        CassandraClient client = new CassandraClient("Test Cluster");
+        CassandraClient client = new CassandraClient("Test Cluster", "tomcat", "tomcat_sessions");
         client.connect("localhost", 1234);
         client.close();
     }
