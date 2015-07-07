@@ -17,15 +17,16 @@ public class CassandraClient {
         this.clusterName = clusterName;
     }
 
-    public void connect(String nodes) {
+    public void connect(String nodes, int port) {
         if (nodes != null) {
-            connect(nodes.split(","));
+            connect(nodes.split(","), port);
         }
     }
-    public void connect(String[] nodes) {
+    public void connect(String[] nodes, int port) {
         cluster = Cluster.builder()
                 .withClusterName(clusterName)
                 .addContactPoints(nodes)
+                .withPort(port)
                 .build();
         session = cluster.connect();
     }
