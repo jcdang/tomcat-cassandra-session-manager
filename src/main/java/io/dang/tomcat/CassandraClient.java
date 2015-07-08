@@ -27,17 +27,6 @@ public class CassandraClient {
             "WITH " +
             "    gc_grace_seconds = 86400 AND " +
             "    compaction = {'class':'LeveledCompactionStrategy'};";
-    protected final String UPSERT_TO_SESSION_TABLE_CQL =
-            "INSERT %s USING TTL ? " +
-            "SET " +
-            "   valid_session = ? " +
-            "   max_inactive = ? " +
-            "   last_access = ? " +
-            "   session_data = ? " +
-            "WHERE " +
-            "   session_id = ?";
-    protected final String DELETE_FROM_SESSION_TABLE_CQL = "DELETE FROM %s WHERE session_id = ?";
-
 
     private Cluster cluster;
     private Session cassandraSession;
