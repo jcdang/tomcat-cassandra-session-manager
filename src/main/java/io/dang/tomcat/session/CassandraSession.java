@@ -8,6 +8,4 @@ public class CassandraSession extends StandardSession {
     public CassandraSession(Manager manager) {
         super(manager);
     }
-
-
 }

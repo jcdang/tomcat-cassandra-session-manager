@@ -1,6 +1,7 @@
 package io.dang.tomcat.session;
 
 import com.datastax.driver.core.utils.UUIDs;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Session;
 import org.apache.catalina.session.PersistentManagerBase;
 import org.apache.juli.logging.Log;
@@ -38,6 +39,30 @@ public class CassandraManager extends PersistentManagerBase {
     @Override
     public String generateSessionId() {
         return UUIDs.timeBased().toString();
+    }
+
+    @Override
+    public void processExpires() {
+        super.processExpires();
+
+        // All Sessions loaded in memory
+        Session[] sessions = findSessions();
+
+        long timeNow = System.currentTimeMillis();
+
+        for (Session session : sessions) {
+            int timeIdle = (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
+            if (timeIdle < session.getMaxInactiveInterval()) {
+                continue;
+            }
+            session.recycle();
+            remove(session);
+        }
+    }
+
+    @Override
+    protected synchronized void startInternal() throws LifecycleException {
+        super.startInternal();
     }
 
     public String getClusterName() {

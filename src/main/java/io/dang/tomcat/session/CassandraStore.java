@@ -14,6 +14,7 @@ import org.apache.catalina.session.StoreBase;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +28,12 @@ public class CassandraStore extends StoreBase {
     protected String sessionIdCol = "id";
 
     protected String sessionDataCol = "session_data";
+
+    protected String sessionValidCol = "is_valid";
+
+    protected String sessionMaxInactiveCol = "max_inactive";
+
+    protected String sessionLastAccessedCol = "last_accessed";
 
     CassandraClient client = new CassandraClient("dummy", "dummy");
 
@@ -116,6 +123,13 @@ public class CassandraStore extends StoreBase {
     public void clear() throws IOException {
         Truncate truncate = QueryBuilder.truncate(sessionTableName);
         client.getSession().execute(truncate);
+    }
+
+    @Override
+    public void processExpires() {
+        // NOOP
+        // Note: Sessions in Cassandra will expire by themselves with TTL.
+        // We only need to get rid of the sessions in memory
     }
 
     @Override
