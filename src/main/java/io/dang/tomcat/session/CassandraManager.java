@@ -40,17 +40,6 @@ public class CassandraManager extends PersistentManagerBase {
         return UUIDs.timeBased().toString();
     }
 
-    @Override
-    public Session findSession(String sessionId) throws IOException {
-        Session session = super.findSession(sessionId);
-
-        if (session != null) {
-            log.debug("Found cached Session for id = {}" + sessionId);
-            return session;
-        }
-        return null; // TODO
-    }
-
     public String getClusterName() {
         return clusterName;
     }

@@ -3,6 +3,9 @@ package io.dang.tomcat;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.querybuilder.Insert;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
+import io.dang.tomcat.session.CassandraSession;
 
 public class CassandraClient {
 
@@ -11,10 +14,11 @@ public class CassandraClient {
     protected final String CREATE_KEYSPACE_CQL = "CREATE KEYSPACE %s " + REPLICATION;
     protected final String TABLE_EXISTS_CQL = "SELECT COLUMNFAMILY_NAME FROM SYSTEM.SCHEMA_COLUMNFAMILIES " +
                                               "WHERE KEYSPACE_NAME = ? AND COLUMNFAMILY_NAME = ?";
+
+    // TODO Move below out from CassandraClient
     protected final String CREATE_SESSION_TABLE_CQL =
             "CREATE TABLE %s (" +
             "    session_id     timeuuid PRIMARY KEY, " +
-            "    app_name       text, " +
             "    valid_session  boolean, " +
             "    max_inactive   bigint, " +
             "    last_access    timestamp, " +
@@ -26,7 +30,6 @@ public class CassandraClient {
     protected final String UPSERT_TO_SESSION_TABLE_CQL =
             "INSERT %s USING TTL ? " +
             "SET " +
-            "   app_name = ? " +
             "   valid_session = ? " +
             "   max_inactive = ? " +
             "   last_access = ? " +
@@ -40,12 +43,11 @@ public class CassandraClient {
     private Session cassandraSession;
     private String clusterName;
     private String keyspaceName;
-    private String tableName;
+    private String tableName = "sessions";
 
-    public CassandraClient(String clusterName, String keyspaceName, String tableName) {
+    public CassandraClient(String clusterName, String keyspaceName) {
         this.clusterName = clusterName;
         this.keyspaceName = keyspaceName;
-        this.tableName = tableName;
     }
 
     public void connect(String nodes, int port) {
@@ -64,7 +66,6 @@ public class CassandraClient {
 
         doCreateKeyspace(globalSession, keyspaceName);
 
-
         try {
             if (!isKeyspacePresent(globalSession, keyspaceName)) {
                 throw new IllegalStateException("Unable to create keyspace " + keyspaceName);
@@ -78,7 +79,7 @@ public class CassandraClient {
         cassandraSession = cluster.connect(keyspaceName);
 
         if (createTable) {
-          doCreateSessionTable(cassandraSession, keyspaceName, tableName);
+          doCreateSessionTable(tableName);
         }
     }
 
@@ -92,11 +93,24 @@ public class CassandraClient {
         }
     }
 
+    public Session getSession() {
+        return cassandraSession;
+    }
 
+    /**
+     * Creates the session table if the table doesn't already exist.
+     * @param tableName the session table name
+     */
     public void doCreateSessionTable(String tableName) {
         doCreateSessionTable(cassandraSession, keyspaceName, tableName);
     }
 
+    /**
+     * Creates the session table if the table doesn't already exist.
+     * @param session The cassandra session
+     * @param keyspaceName the keyspace name
+     * @param tableName the session table name
+     */
     public void doCreateSessionTable(Session session, String keyspaceName, String tableName) {
         if (session == null || keyspaceName == null || tableName == null)
             throw new IllegalArgumentException("Unable to create table " + tableName);
@@ -107,11 +121,24 @@ public class CassandraClient {
         session.execute(String.format(CREATE_SESSION_TABLE_CQL, tableName));
     }
 
+
+    /**
+     * Tests to see if a table exists in context of the default keyspace.
+     * @param tableName The table being checked
+     * @return true if table is present false otherwise
+     */
     public boolean isTablePresent(String tableName) {
         return isTablePresent(cassandraSession, keyspaceName, tableName);
     }
 
 
+    /**
+    * Tests to see if a table exists
+    * @param session The cassandra session
+    * @param keyspaceName the table's keyspace
+    * @param tableName The table being checked
+    * @return true if table is present and false otherwise
+    */
     public boolean isTablePresent(Session session, String keyspaceName, String tableName) {
         if (session == null || keyspaceName == null || tableName == null)
             return false;
