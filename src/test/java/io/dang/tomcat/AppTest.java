@@ -10,6 +10,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.thrift.transport.TTransportException;
 import org.cassandraunit.utils.EmbeddedCassandraServerHelper;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.apache.catalina.startup.Tomcat;
@@ -56,7 +57,7 @@ public class AppTest {
 
     @Test
     public void cassandraClientTest() {
-        CassandraClient client = new CassandraClient("Test Cluster", "tomcat", "tomcat_sessions");
+        CassandraClient client = new CassandraClient("Test Cluster", "tomcat");
         client.connect("localhost", CASSANDRA_PORT);
         client.close();
     }

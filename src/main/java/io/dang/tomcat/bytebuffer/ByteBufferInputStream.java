@@ -1,7 +1,5 @@
 package io.dang.tomcat.bytebuffer;
 
-import com.sun.istack.internal.NotNull;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
