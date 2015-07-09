@@ -9,6 +9,7 @@ import io.dang.tomcat.io.ByteBufferOutputStream;
 import org.apache.catalina.Context;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
+import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.session.StoreBase;
 
 import java.io.*;
@@ -65,8 +66,8 @@ public class CassandraStore extends StoreBase {
     }
 
     @Override
-    public CassandraSession load(String id) throws ClassNotFoundException, IOException {
-        CassandraSession session = (CassandraSession) getManager().createEmptySession();
+    public StandardSession load(String id) throws ClassNotFoundException, IOException {
+        StandardSession session = (StandardSession) getManager().createEmptySession();
 
         Select select = QueryBuilder.select(sessionIdCol, sessionDataCol)
                 .from(sessionTableName)
@@ -135,7 +136,7 @@ public class CassandraStore extends StoreBase {
 
     @Override
     public void save(Session session) throws IOException {
-        CassandraSession cSession = (CassandraSession) session;
+        StandardSession cSession = (StandardSession) session;
         ByteBufferOutputStream bbos = new ByteBufferOutputStream();
         BufferedOutputStream bos = new BufferedOutputStream(bbos);
 
