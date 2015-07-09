@@ -5,7 +5,6 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
-import io.dang.tomcat.session.CassandraSession;
 
 public class CassandraClient {
 
