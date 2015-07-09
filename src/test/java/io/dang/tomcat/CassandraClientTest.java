@@ -17,12 +17,7 @@ public class CassandraClientTest {
 
     @BeforeClass
     public static void start() {
-           scassandra = ScassandraFactory.createServer(binaryPort, adminPort);
-    }
-
-    @Test
-    public void clientTest() {
-        CassandraClient client = new CassandraClient("TestCluster", "TestKeyspace");
+        scassandra = ScassandraFactory.createServer(binaryPort, adminPort);
         primingClient = scassandra.primingClient();
         activityClient = scassandra.activityClient();
         scassandra.start();
@@ -39,8 +34,14 @@ public class CassandraClientTest {
         primingClient.clearAllPrimes();
     }
 
-    @AfterMethod
-    public void tearDown() {
+    @Test
+    public void basicTest() {
+        CassandraClient cassandraClient = new CassandraClient("TestCluster", "TestKeyspace");
 
+        cassandraClient.connect("localhost", binaryPort);
+
+        activityClient.retrieveQueries();
+        assertEquals(true, true);
+        cassandraClient.close();
     }
 }

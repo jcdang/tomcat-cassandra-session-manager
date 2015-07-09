@@ -14,8 +14,6 @@ public class CassandraClient {
     protected final String TABLE_EXISTS_CQL = "SELECT COLUMNFAMILY_NAME FROM SYSTEM.SCHEMA_COLUMNFAMILIES " +
                                               "WHERE KEYSPACE_NAME = ? AND COLUMNFAMILY_NAME = ?";
 
-
-
     private Cluster cluster;
     private Session cassandraSession;
     private String clusterName;
@@ -47,17 +45,11 @@ public class CassandraClient {
             if (!isKeyspacePresent(globalSession, keyspaceName)) {
                 throw new IllegalStateException("Unable to create keyspace " + keyspaceName);
             }
-/*            if (!isTablePresent(globalSession, keyspaceName, tableName)) {
-                createTable = true;
-            }*/
+
         } finally {
             globalSession.close();
         }
         cassandraSession = cluster.connect(keyspaceName);
-
- /*       if (createTable) {
-          doCreateSessionTable(tableName);
-        }*/
     }
 
     public void close() {

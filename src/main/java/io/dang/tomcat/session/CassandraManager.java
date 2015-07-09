@@ -55,16 +55,6 @@ public class CassandraManager extends PersistentManagerBase {
     }
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
-        super.startInternal();
-    }
-
-    @Override
-    protected synchronized void stopInternal() throws LifecycleException {
-        super.stopInternal();
-    }
-
-    @Override
     public SessionIdGenerator getSessionIdGenerator() {
         return sessionIdGenerator;
     }

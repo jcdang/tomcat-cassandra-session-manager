@@ -31,40 +31,65 @@ public class CassandraStore extends StoreBase {
 
     protected String sessionDataCol = "session_data";
 
-    protected String clusterName;
-    protected String keyspace;
-    protected String nodes;
+    protected String clusterName = "TestCluster";
+    protected String keyspace = "tomcat";
+    protected String nodes = "localhost";
+    protected int nativePort = 9042;
 
-    CassandraClient client = new CassandraClient("dummy", "dummy");
+
+    final Object clientLock = new Object();
+
+    CassandraClient client = null;
 
     protected final String CREATE_SESSION_TABLE_CQL =
             "CREATE TABLE %s (" +
-                    "    session_id     timeuuid PRIMARY KEY, " +
-                    "    valid_session  boolean, " +
-                    "    max_inactive   bigint, " +
-                    "    last_access    timestamp, " +
-                    "    session_data   blob " +
+                    "    %s     timeuuid PRIMARY KEY, " +
+                    "    %s     boolean, " +
+                    "    %s     bigint, " +
+                    "    %s     timestamp, " +
+                    "    %s     blob " +
                     ") " +
                     "WITH " +
                     "    gc_grace_seconds = 86400 AND " +
                     "    compaction = {'class':'LeveledCompactionStrategy'};";
+
+
+
+    protected CassandraClient getClient() {
+        if (client == null) {
+            synchronized (clientLock) {
+                if (client == null) {
+                    client = new CassandraClient(clusterName, keyspace);
+                    client.connect(nodes, nativePort);
+                    doCreateSessionTable();
+                }
+                return client;
+            }
+        }
+        return client;
+    }
 
     /**
      * Creates the session table if the table doesn't already exist.
      */
     public void doCreateSessionTable() {
 
-        if (client.isTablePresent(sessionTableName))
+        if (getClient().isTablePresent(sessionTableName))
             return;
 
-        client.getSession().execute(String.format(CREATE_SESSION_TABLE_CQL, sessionTableName));
+        getClient().getSession().execute(String.format(CREATE_SESSION_TABLE_CQL,
+                sessionTableName,
+                sessionIdCol,
+                sessionValidCol,
+                sessionMaxInactiveCol,
+                sessionLastAccessedCol,
+                sessionDataCol));
     }
-
 
     @Override
     public int getSize() throws IOException {
         Select select = QueryBuilder.select().countAll().from(sessionTableName);
-        ResultSet rs = client.getSession().execute(select);
+        ResultSet rs = getClient().getSession().execute(select);
         Row row = rs.one();
 
         return row.getInt(0);
@@ -73,7 +98,7 @@ public class CassandraStore extends StoreBase {
     @Override
     public String[] keys() throws IOException {
         Select select = QueryBuilder.select(sessionIdCol).from(sessionTableName);
-        ResultSet rs = client.getSession().execute(select);
+        ResultSet rs = getClient().getSession().execute(select);
 
         List<Row> rows = rs.all();
         String[] retArray = new String[rows.size()];
@@ -141,13 +166,13 @@ public class CassandraStore extends StoreBase {
                 .from(sessionTableName)
                 .where(QueryBuilder.eq(sessionIdCol, uuid))
                 .ifExists();
-        client.getSession().execute(delete);
+        getClient().getSession().execute(delete);
     }
 
     @Override
     public void clear() throws IOException {
         Truncate truncate = QueryBuilder.truncate(sessionTableName);
-        client.getSession().execute(truncate);
+        getClient().getSession().execute(truncate);
     }
 
     @Override
@@ -175,7 +200,7 @@ public class CassandraStore extends StoreBase {
                 .value(sessionMaxInactiveCol, session.getMaxInactiveInterval())   // probably don't need this column
                 .value(sessionLastAccessedCol, session.getLastAccessedTime());
 
-        client.getSession().execute(insert);
+        getClient().getSession().execute(insert);
     }
 
 
@@ -184,7 +209,9 @@ public class CassandraStore extends StoreBase {
     }
 
     public void setClusterName(String clusterName) {
+        String oldClusterName = this.clusterName;
         this.clusterName = clusterName;
+        support.firePropertyChange("clusterName", oldClusterName, this.clusterName);
     }
 
     public String getKeyspace() {
@@ -192,7 +219,9 @@ public class CassandraStore extends StoreBase {
     }
 
     public void setKeyspace(String keyspace) {
+        String oldKeyspace = this.keyspace;
         this.keyspace = keyspace;
+        support.firePropertyChange("keyspace", oldKeyspace, this.keyspace);
     }
 
     public String getNodes() {
@@ -200,6 +229,16 @@ public class CassandraStore extends StoreBase {
     }
 
     public void setNodes(String nodes) {
+        String oldNodes = this.nodes;
         this.nodes = nodes;
+        support.firePropertyChange("nodes", oldNodes, this.nodes);
+    }
+
+    public int getNativePort() { return nativePort; }
+
+    public void setNativePort(int nativePort) {
+        int oldNativePort = this.nativePort;
+        this.nativePort = nativePort;
+        support.firePropertyChange("nativePort", oldNativePort, this.nativePort);
     }
 }
