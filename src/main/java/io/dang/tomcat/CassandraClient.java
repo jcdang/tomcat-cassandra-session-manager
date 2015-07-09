@@ -31,7 +31,6 @@ public class CassandraClient {
         }
     }
     public void connect(String[] nodes, int port) {
-//        boolean createTable = false;
         cluster = Cluster.builder()
                 .withClusterName(clusterName)
                 .addContactPoints(nodes)
