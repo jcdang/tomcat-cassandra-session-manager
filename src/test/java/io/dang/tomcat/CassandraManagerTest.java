@@ -18,7 +18,7 @@ public class CassandraManagerTest {
     ConcurrentHashSet<String> sessionIds = new ConcurrentHashSet<>();
 
     @Test(invocationCount = 200, threadPoolSize = 8)
-    public void testSessionIdGenerator() {
+    public void sessionIdGeneratorTest() {
         Manager manager = new CassandraManager();
         SessionIdGenerator sGenerator = manager.getSessionIdGenerator();
 
