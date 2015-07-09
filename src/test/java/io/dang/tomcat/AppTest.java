@@ -32,10 +32,16 @@ public class AppTest {
     Tomcat tomcat;
     String webAppPath = "src/test/webapp";
 
-    @BeforeMethod
-    public void setUp() throws InterruptedException, TTransportException, ConfigurationException, IOException, LifecycleException, ServletException
-    {
+
+    @BeforeClass
+    public void beforeClass() throws ConfigurationException, IOException, TTransportException {
         EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml");
+    }
+
+    @BeforeMethod
+    public void setUp() throws InterruptedException, LifecycleException, ServletException
+    {
+        EmbeddedCassandraServerHelper.cleanEmbeddedCassandra();
         tomcat = new Tomcat();
         tomcat.setPort(TOMCAT_PORT);
         tomcat.setSilent(true);

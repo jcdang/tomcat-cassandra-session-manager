@@ -17,8 +17,10 @@ public class ByteBufferInputStream extends InputStream {
         if (!byteBuffer.hasRemaining()) {
             return -1;
         }
+        // Method contract states the return is a byte even though the signature is returning int
         return byteBuffer.get();
     }
+
 
     @Override
     public synchronized int read(byte[] b, int off, int len) throws IOException {
@@ -39,6 +41,31 @@ public class ByteBufferInputStream extends InputStream {
     @Override
     public int available() throws IOException {
         return byteBuffer.remaining();
+    }
+
+    @Override
+    public long skip(long n) throws IOException {
+        long minInput = Math.min(n, (long)Integer.MAX_VALUE);
+        int offset = (int) minInput;
+
+        byteBuffer.position(byteBuffer.position() + offset);
+
+        return byteBuffer.position();
+    }
+
+    @Override
+    public synchronized void reset() throws IOException {
+        byteBuffer.reset();
+    }
+
+    @Override
+    public synchronized void mark(int readlimit) {
+        byteBuffer.mark();
+    }
+
+    @Override
+    public boolean markSupported() {
+        return true;
     }
 
     @Override
