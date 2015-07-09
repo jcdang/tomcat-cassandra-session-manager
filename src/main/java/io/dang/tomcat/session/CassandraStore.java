@@ -31,6 +31,11 @@ public class CassandraStore extends StoreBase {
 
     protected String sessionLastAccessedCol = "last_accessed";
 
+    protected String clusterName;
+    protected String keyspace;
+    protected String tableName;
+    protected String nodes;
+
     CassandraClient client = new CassandraClient("dummy", "dummy");
 
     @Override
@@ -143,9 +148,42 @@ public class CassandraStore extends StoreBase {
                 .value(sessionIdCol, UUID.fromString(session.getId()))
                 .value(sessionDataCol, bbos.getByteBuffer())
                 .value(sessionValidCol, cSession.isValid())
-                .value(sessionMaxInactiveCol, session.getMaxInactiveInterval())
+                .value(sessionMaxInactiveCol, session.getMaxInactiveInterval())   // probably don't need this column
                 .value(sessionLastAccessedCol, session.getLastAccessedTime());
 
         client.getSession().execute(insert);
+    }
+
+
+    public String getClusterName() {
+        return clusterName;
+    }
+
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
+    }
+
+    public String getKeyspace() {
+        return keyspace;
+    }
+
+    public void setKeyspace(String keyspace) {
+        this.keyspace = keyspace;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public String getNodes() {
+        return nodes;
+    }
+
+    public void setNodes(String nodes) {
+        this.nodes = nodes;
     }
 }

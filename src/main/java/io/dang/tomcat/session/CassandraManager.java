@@ -3,7 +3,9 @@ package io.dang.tomcat.session;
 import com.datastax.driver.core.utils.UUIDs;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Session;
+import org.apache.catalina.SessionIdGenerator;
 import org.apache.catalina.session.PersistentManagerBase;
+import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -17,13 +19,11 @@ public class CassandraManager extends PersistentManagerBase {
 
     protected static final String NAME = "CassandraManager";
 
-    protected String clusterName;
-    protected String keyspace;
-    protected String tableName;
-    protected String nodes;
 
     public CassandraManager() {
 
+        sessionIdGenerator = UuidSessionIdGenerator.getInstance();
+        sessionIdGeneratorClass = UuidSessionIdGenerator.class;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class CassandraManager extends PersistentManagerBase {
 
     @Override
     public String generateSessionId() {
-        return UUIDs.timeBased().toString();
+        return sessionIdGenerator.generateSessionId();
     }
 
     @Override
@@ -65,36 +65,44 @@ public class CassandraManager extends PersistentManagerBase {
         super.startInternal();
     }
 
-    public String getClusterName() {
-        return clusterName;
+    @Override
+    protected synchronized void stopInternal() throws LifecycleException {
+        super.stopInternal();
     }
 
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
+    @Override
+    public SessionIdGenerator getSessionIdGenerator() {
+        return sessionIdGenerator;
     }
 
-    public String getKeyspace() {
-        return keyspace;
+    @Override
+    public void setSessionIdGenerator(SessionIdGenerator sessionIdGenerator) {
+        log.warn("SessionIdGenerator cannot be modified");
     }
 
-    public void setKeyspace(String keyspace) {
-        this.keyspace = keyspace;
-    }
+    /**
+     * UUID Session ID Generator UUIDs are required for this manager
+     */
+    public static class UuidSessionIdGenerator extends SessionIdGeneratorBase {
 
-    public String getTableName() {
-        return tableName;
-    }
+        public static final UuidSessionIdGenerator INSTANCE = new UuidSessionIdGenerator();
 
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
+        private UuidSessionIdGenerator() {}
 
-    public String getNodes() {
-        return nodes;
-    }
+        @Override
+        public String generateSessionId(String route) {
+            return UUIDs.timeBased().toString();
+        }
 
-    public void setNodes(String nodes) {
-        this.nodes = nodes;
+        public static UuidSessionIdGenerator getInstance() {
+            return INSTANCE;
+        }
+
+        @Override
+        public int getSessionIdLength() {
+            // UUID length
+            return 36;
+        }
     }
 
 }
