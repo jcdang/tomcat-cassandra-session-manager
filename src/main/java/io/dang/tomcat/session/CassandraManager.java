@@ -4,6 +4,7 @@ import com.datastax.driver.core.utils.UUIDs;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Session;
 import org.apache.catalina.SessionIdGenerator;
+import org.apache.catalina.Store;
 import org.apache.catalina.session.PersistentManagerBase;
 import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.juli.logging.Log;
@@ -29,11 +30,6 @@ public class CassandraManager extends PersistentManagerBase {
     @Override
     public String getName() {
         return NAME;
-    }
-
-    @Override
-    public Session createEmptySession() {
-        return new CassandraSession(this);
     }
 
     @Override
@@ -78,6 +74,14 @@ public class CassandraManager extends PersistentManagerBase {
     @Override
     public void setSessionIdGenerator(SessionIdGenerator sessionIdGenerator) {
         log.warn("SessionIdGenerator cannot be modified");
+    }
+
+    @Override
+    public void setStore(Store store) {
+        if (!(store instanceof CassandraStore)) {
+            throw new IllegalArgumentException("This store must derived from CassandraStore");
+        }
+        super.setStore(store);
     }
 
     /**
