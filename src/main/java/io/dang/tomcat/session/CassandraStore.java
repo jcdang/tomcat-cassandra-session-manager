@@ -4,8 +4,6 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.querybuilder.*;
 import io.dang.tomcat.CassandraClient;
-import io.dang.tomcat.io.ByteBufferInputStream;
-import io.dang.tomcat.io.ByteBufferOutputStream;
 import org.apache.catalina.Context;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
@@ -13,6 +11,7 @@ import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.session.StoreBase;
 
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.UUID;
 
@@ -83,7 +82,8 @@ public class CassandraStore extends StoreBase {
         }
 
         Context context = manager.getContext();
-        ByteBufferInputStream bis = new ByteBufferInputStream(row.getBytes(1));
+        ByteBuffer byteBuffer = row.getBytes(1);
+        ByteArrayInputStream bis = new ByteArrayInputStream(byteBuffer.array());
         Loader loader = null;
         ClassLoader classLoader = null;
         ObjectInputStream ois;
@@ -137,8 +137,8 @@ public class CassandraStore extends StoreBase {
     @Override
     public void save(Session session) throws IOException {
         StandardSession cSession = (StandardSession) session;
-        ByteBufferOutputStream bbos = new ByteBufferOutputStream();
-        BufferedOutputStream bos = new BufferedOutputStream(bbos);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        BufferedOutputStream bos = new BufferedOutputStream(baos);
 
         try (ObjectOutputStream oos = new ObjectOutputStream(bos)) {
             cSession.writeObjectData(oos);
@@ -147,7 +147,7 @@ public class CassandraStore extends StoreBase {
         Insert insert = QueryBuilder.insertInto(sessionTableName)
                 .using(QueryBuilder.ttl(session.getMaxInactiveInterval()))
                 .value(sessionIdCol, UUID.fromString(session.getId()))
-                .value(sessionDataCol, bbos.getByteBuffer())
+                .value(sessionDataCol, ByteBuffer.wrap(baos.toByteArray()))
                 .value(sessionValidCol, cSession.isValid())
                 .value(sessionMaxInactiveCol, session.getMaxInactiveInterval())   // probably don't need this column
                 .value(sessionLastAccessedCol, session.getLastAccessedTime());

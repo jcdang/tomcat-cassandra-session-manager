@@ -19,6 +19,7 @@
     <htmlunit.version>2.15</htmlunit.version>
     <httpcore.version>4.4.1</httpcore.version>
     <java.version>1.8</java.version>
+    <scassandra.version>0.8.0</scassandra.version>
   </properties>
 
 
@@ -121,6 +122,17 @@
       <artifactId>httpcore</artifactId>
       <version>${httpcore.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.scassandra</groupId>
+      <artifactId>scassandra-server_2.11</artifactId>
+      <version>${scassandra.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.scassandra</groupId>
+      <artifactId>java-client</artifactId>
+      <version>${scassandra.version}</version>
     </dependency>
   </dependencies>
 </project>
