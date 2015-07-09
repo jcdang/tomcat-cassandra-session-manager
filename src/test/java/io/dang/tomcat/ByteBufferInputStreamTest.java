@@ -8,7 +8,6 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.UUID;
 
 import static org.testng.Assert.*;
 
@@ -32,10 +31,18 @@ public class ByteBufferInputStreamTest {
     }
 
     @Test
-    public void skipTest() {
+    public void skipTest() throws IOException {
         ByteBuffer bb = ByteBuffer.wrap(alpha);
         ByteBufferInputStream bis = new ByteBufferInputStream(bb);
 
-        bis.
+        long pos = bis.skip(13);
+
+        assertEquals(pos, 13);
+        assertEquals(bis.available(), 13);
+
+        pos = bis.skip(13);
+
+        assertEquals(pos, 26);
+        assertEquals(0, 0);
     }
 }
