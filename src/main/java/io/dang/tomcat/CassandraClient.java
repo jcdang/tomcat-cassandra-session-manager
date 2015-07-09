@@ -45,7 +45,7 @@ public class CassandraClient {
         }
     }
     public void connect(String[] nodes, int port) {
-        boolean createTable = false;
+//        boolean createTable = false;
         cluster = Cluster.builder()
                 .withClusterName(clusterName)
                 .addContactPoints(nodes)
@@ -59,17 +59,17 @@ public class CassandraClient {
             if (!isKeyspacePresent(globalSession, keyspaceName)) {
                 throw new IllegalStateException("Unable to create keyspace " + keyspaceName);
             }
-            if (!isTablePresent(globalSession, keyspaceName, tableName)) {
+/*            if (!isTablePresent(globalSession, keyspaceName, tableName)) {
                 createTable = true;
-            }
+            }*/
         } finally {
             globalSession.close();
         }
         cassandraSession = cluster.connect(keyspaceName);
 
-        if (createTable) {
+ /*       if (createTable) {
           doCreateSessionTable(tableName);
-        }
+        }*/
     }
 
     public void close() {

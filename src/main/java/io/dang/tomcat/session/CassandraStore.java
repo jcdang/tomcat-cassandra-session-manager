@@ -2,23 +2,19 @@ package io.dang.tomcat.session;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
-import com.datastax.driver.core.querybuilder.Delete;
-import com.datastax.driver.core.querybuilder.Select;
-import com.datastax.driver.core.querybuilder.Truncate;
+import com.datastax.driver.core.querybuilder.*;
 import io.dang.tomcat.CassandraClient;
-import io.dang.tomcat.bytebuffer.ByteBufferInputStream;
+import io.dang.tomcat.io.ByteBufferInputStream;
+import io.dang.tomcat.io.ByteBufferOutputStream;
 import org.apache.catalina.Context;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
 import org.apache.catalina.session.StoreBase;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.HashMap;
+import java.io.*;
 import java.util.List;
 import java.util.UUID;
 
-import com.datastax.driver.core.querybuilder.QueryBuilder;
 import org.apache.catalina.util.CustomObjectInputStream;
 
 public class CassandraStore extends StoreBase {
@@ -134,6 +130,22 @@ public class CassandraStore extends StoreBase {
 
     @Override
     public void save(Session session) throws IOException {
+        CassandraSession cSession = (CassandraSession) session;
+        ByteBufferOutputStream bbos = new ByteBufferOutputStream();
+        BufferedOutputStream bos = new BufferedOutputStream(bbos);
 
+        try (ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+            cSession.writeObjectData(oos);
+        }
+
+        Insert insert = QueryBuilder.insertInto(sessionTableName)
+                .using(QueryBuilder.ttl(session.getMaxInactiveInterval()))
+                .value(sessionIdCol, UUID.fromString(session.getId()))
+                .value(sessionDataCol, bbos.getByteBuffer())
+                .value(sessionValidCol, cSession.isValid())
+                .value(sessionMaxInactiveCol, session.getMaxInactiveInterval())
+                .value(sessionLastAccessedCol, session.getLastAccessedTime());
+
+        client.getSession().execute(insert);
     }
 }
