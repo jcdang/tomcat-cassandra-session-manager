@@ -22,6 +22,8 @@ public class ByteBufferOutputStreamTest {
         bbos.write(bytes);
 
         ByteBuffer bb = bbos.getByteBuffer();
+        // dont think this is right
+        bb.limit(0);
 
         int i = 0;
         while (bb.hasRemaining()) {
