@@ -14,18 +14,7 @@ public class CassandraClient {
     protected final String TABLE_EXISTS_CQL = "SELECT COLUMNFAMILY_NAME FROM SYSTEM.SCHEMA_COLUMNFAMILIES " +
                                               "WHERE KEYSPACE_NAME = ? AND COLUMNFAMILY_NAME = ?";
 
-    // TODO Move below out from CassandraClient
-    protected final String CREATE_SESSION_TABLE_CQL =
-            "CREATE TABLE %s (" +
-            "    session_id     timeuuid PRIMARY KEY, " +
-            "    valid_session  boolean, " +
-            "    max_inactive   bigint, " +
-            "    last_access    timestamp, " +
-            "    session_data   blob " +
-            ") " +
-            "WITH " +
-            "    gc_grace_seconds = 86400 AND " +
-            "    compaction = {'class':'LeveledCompactionStrategy'};";
+
 
     private Cluster cluster;
     private Session cassandraSession;
@@ -84,31 +73,6 @@ public class CassandraClient {
     public Session getSession() {
         return cassandraSession;
     }
-
-    /**
-     * Creates the session table if the table doesn't already exist.
-     * @param tableName the session table name
-     */
-    public void doCreateSessionTable(String tableName) {
-        doCreateSessionTable(cassandraSession, keyspaceName, tableName);
-    }
-
-    /**
-     * Creates the session table if the table doesn't already exist.
-     * @param session The cassandra session
-     * @param keyspaceName the keyspace name
-     * @param tableName the session table name
-     */
-    public void doCreateSessionTable(Session session, String keyspaceName, String tableName) {
-        if (session == null || keyspaceName == null || tableName == null)
-            throw new IllegalArgumentException("Unable to create table " + tableName);
-
-        if (isTablePresent(session, keyspaceName, tableName))
-            return;
-
-        session.execute(String.format(CREATE_SESSION_TABLE_CQL, tableName));
-    }
-
 
     /**
      * Tests to see if a table exists in context of the default keyspace.
