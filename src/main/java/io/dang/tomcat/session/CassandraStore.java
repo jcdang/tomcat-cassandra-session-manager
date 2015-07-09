@@ -23,20 +23,43 @@ public class CassandraStore extends StoreBase {
 
     protected String sessionIdCol = "id";
 
-    protected String sessionDataCol = "session_data";
-
     protected String sessionValidCol = "is_valid";
 
     protected String sessionMaxInactiveCol = "max_inactive";
 
     protected String sessionLastAccessedCol = "last_accessed";
 
+    protected String sessionDataCol = "session_data";
+
     protected String clusterName;
     protected String keyspace;
-    protected String tableName;
     protected String nodes;
 
     CassandraClient client = new CassandraClient("dummy", "dummy");
+
+    protected final String CREATE_SESSION_TABLE_CQL =
+            "CREATE TABLE %s (" +
+                    "    session_id     timeuuid PRIMARY KEY, " +
+                    "    valid_session  boolean, " +
+                    "    max_inactive   bigint, " +
+                    "    last_access    timestamp, " +
+                    "    session_data   blob " +
+                    ") " +
+                    "WITH " +
+                    "    gc_grace_seconds = 86400 AND " +
+                    "    compaction = {'class':'LeveledCompactionStrategy'};";
+
+    /**
+     * Creates the session table if the table doesn't already exist.
+     */
+    public void doCreateSessionTable() {
+
+        if (client.isTablePresent(sessionTableName))
+            return;
+
+        client.getSession().execute(String.format(CREATE_SESSION_TABLE_CQL, sessionTableName));
+    }
+
 
     @Override
     public int getSize() throws IOException {
@@ -170,14 +193,6 @@ public class CassandraStore extends StoreBase {
 
     public void setKeyspace(String keyspace) {
         this.keyspace = keyspace;
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
     }
 
     public String getNodes() {

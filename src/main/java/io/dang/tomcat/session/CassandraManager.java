@@ -10,8 +10,6 @@ import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-import java.io.IOException;
-
 /**
  * https://tomcat.apache.org/tomcat-8.0-doc/config/manager.html
  */
