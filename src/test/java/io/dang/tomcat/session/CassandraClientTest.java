@@ -1,6 +1,7 @@
-package io.dang.tomcat;
+package io.dang.tomcat.session;
 
 import com.google.common.collect.ImmutableMap;
+import io.dang.tomcat.CassandraClient;
 import org.scassandra.Scassandra;
 import org.scassandra.ScassandraFactory;
 import org.scassandra.http.client.*;
@@ -65,6 +66,5 @@ public class CassandraClientTest {
         assertNotEquals(activityClient.retrieveConnections().size(), 0);
 
         cassandraClient.close();
-
     }
 }

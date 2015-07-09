@@ -1,4 +1,4 @@
-package io.dang.tomcat;
+package io.dang.tomcat.session;
 
 import io.dang.tomcat.session.CassandraManager;
 import org.apache.catalina.Manager;
