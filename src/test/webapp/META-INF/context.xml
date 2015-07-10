@@ -1,0 +1,9 @@
+<Context>
+    <Manager className="io.dang.tomcat.session.CassandraManager">
+
+        <Store className="io.dang.tomcat.session.CassandraStore"
+               clusterName="DarwinCluster"
+               keyspace="tomcat"
+               nodes="cassandra22" />
+    </Manager>
+</Context>

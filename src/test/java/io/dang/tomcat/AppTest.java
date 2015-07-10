@@ -35,13 +35,13 @@ public class AppTest {
 
     @BeforeClass
     public void beforeClass() throws ConfigurationException, IOException, TTransportException {
-        EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml");
+        //EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml");
     }
 
     @BeforeMethod
     public void setUp() throws InterruptedException, LifecycleException, ServletException
     {
-        EmbeddedCassandraServerHelper.cleanEmbeddedCassandra();
+        //EmbeddedCassandraServerHelper.cleanEmbeddedCassandra();
         tomcat = new Tomcat();
         tomcat.setPort(TOMCAT_PORT);
         tomcat.setSilent(true);
@@ -68,7 +68,7 @@ public class AppTest {
         client.close();
     }
 
-    @Test(enabled = false)
+    @Test(enabled = true)
     public void tomcatClientTest() throws IOException
     {
         WebClient webClient = new WebClient();

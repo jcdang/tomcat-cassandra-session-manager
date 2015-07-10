@@ -28,6 +28,11 @@ public class CassandraManager extends PersistentManagerBase {
     }
 
     @Override
+    public Session createEmptySession() {
+        return new CassandraSession(this);
+    }
+
+    @Override
     public String getName() {
         return NAME;
     }
@@ -69,6 +74,13 @@ public class CassandraManager extends PersistentManagerBase {
         } catch (IOException e) {
             log.error("Failed to save session");
         }
+    }
+
+    @Override
+    public Session createSession(String sessionId) {
+        Session session = super.createSession(sessionId);
+        add(session);
+        return session;
     }
 
     @Override
