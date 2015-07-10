@@ -5,6 +5,7 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.querybuilder.*;
 import io.dang.tomcat.CassandraClient;
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
 import org.apache.catalina.session.StandardSession;
@@ -52,6 +53,8 @@ public class CassandraStore extends StoreBase {
                     "WITH " +
                     "    gc_grace_seconds = 86400 AND " +
                     "    compaction = {'class':'LeveledCompactionStrategy'};";
+
+
 
 
 
@@ -168,12 +171,22 @@ public class CassandraStore extends StoreBase {
 
     @Override
     public void remove(String id) throws IOException {
+        if (id == null) {
+            return;
+        }
+
         UUID uuid = UUID.fromString(id);
         Delete delete = QueryBuilder.delete()
                 .from(sessionTableName)
                 .where(QueryBuilder.eq(sessionIdCol, uuid))
                 .ifExists();
         getClient().getSession().execute(delete);
+    }
+
+    @Override
+    protected synchronized void startInternal() throws LifecycleException {
+        super.startInternal();
+        getClient();
     }
 
     @Override
