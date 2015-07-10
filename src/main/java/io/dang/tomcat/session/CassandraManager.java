@@ -10,6 +10,8 @@ import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+import java.io.IOException;
+
 /**
  * https://tomcat.apache.org/tomcat-8.0-doc/config/manager.html
  */
@@ -45,13 +47,37 @@ public class CassandraManager extends PersistentManagerBase {
         long timeNow = System.currentTimeMillis();
 
         for (Session session : sessions) {
-            int timeIdle = (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
-            if (timeIdle < session.getMaxInactiveInterval()) {
-                continue;
+            if (session.isValid()) {
+                int timeIdle = (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
+                if (timeIdle < session.getMaxInactiveInterval()) {
+                    continue;
+                }
             }
             session.recycle();
             remove(session);
         }
+    }
+
+    @Override
+    public void add(Session session) {
+        // this will add it to active
+        super.add(session);
+
+        // this will persist it
+        try {
+            store.save(session);
+        } catch (IOException e) {
+            log.error("Failed to save session");
+        }
+    }
+
+    @Override
+    protected void destroyInternal() throws LifecycleException {
+        if (store instanceof CassandraStore) {
+            CassandraStore cs = (CassandraStore) store;
+            cs.close();
+        }
+        super.destroyInternal();
     }
 
     @Override

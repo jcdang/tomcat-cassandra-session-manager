@@ -35,6 +35,23 @@ public class CassandraSession extends StandardSession {
     }
 
 
+    @Override
+    public void setId(String id, boolean notify) {
+
+//        if ((this.id != null) && (manager != null))
+//            manager.remove(this);
+
+        this.id = id;
+
+//        if (manager != null)
+//            manager.add(this);
+
+        if (notify) {
+            tellNew();
+        }
+    }
+
+
     /**
      * Read a serialized version of this session object from the specified
      * object input stream.

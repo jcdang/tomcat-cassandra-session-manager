@@ -61,14 +61,14 @@ public class AppTest {
         assertEquals(1, 1);
     }
 
-    @Test
+    @Test(enabled = false)
     public void cassandraClientTest() {
         CassandraClient client = new CassandraClient("Test Cluster", "tomcat");
         client.connect("localhost", CASSANDRA_PORT);
         client.close();
     }
 
-    @Test
+    @Test(enabled = false)
     public void tomcatClientTest() throws IOException
     {
         WebClient webClient = new WebClient();

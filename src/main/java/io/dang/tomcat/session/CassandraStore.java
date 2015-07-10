@@ -121,7 +121,7 @@ public class CassandraStore extends StoreBase {
                 .where(QueryBuilder.eq(sessionIdCol, UUID.fromString(id)))
                 .limit(1);
 
-        ResultSet rs = client.getSession().execute(select);
+        ResultSet rs = getClient().getSession().execute(select);
 
         Row row = rs.one();
 
@@ -148,8 +148,15 @@ public class CassandraStore extends StoreBase {
             ois = new ObjectInputStream(bis);
         }
 
+        if (session.getIdInternal() != null) {
+            manager.remove(session);
+        }
+
         session.setId(id);
         session.readObjectData(ois);
+
+        manager.add(session);
+
 
         try {
             ois.close();
@@ -201,6 +208,10 @@ public class CassandraStore extends StoreBase {
                 .value(sessionLastAccessedCol, session.getLastAccessedTime());
 
         getClient().getSession().execute(insert);
+    }
+
+    public void close() {
+        getClient().close();
     }
 
 
