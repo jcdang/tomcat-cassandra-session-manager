@@ -77,8 +77,6 @@ public class CassandraManager extends PersistentManagerBase {
      */
     public static class UuidSessionIdGenerator extends SessionIdGeneratorBase {
 
-        public static final UuidSessionIdGenerator INSTANCE = new UuidSessionIdGenerator();
-
         private UuidSessionIdGenerator() {}
 
         @Override
@@ -87,7 +85,7 @@ public class CassandraManager extends PersistentManagerBase {
         }
 
         public static UuidSessionIdGenerator getInstance() {
-            return INSTANCE;
+            return new UuidSessionIdGenerator();
         }
 
         @Override
