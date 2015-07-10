@@ -20,6 +20,7 @@
     <httpcore.version>4.4.1</httpcore.version>
     <java.version>1.8</java.version>
     <scassandra.version>0.8.0</scassandra.version>
+    <kryo.version>3.0.2</kryo.version>
   </properties>
 
 
@@ -78,7 +79,11 @@
       <artifactId>tomcat-jsp-api</artifactId>
       <version>${tomcat.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>com.esotericsoftware</groupId>
+      <artifactId>kryo</artifactId>
+      <version>${kryo.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.apache.cassandra</groupId>
       <artifactId>cassandra-all</artifactId>
