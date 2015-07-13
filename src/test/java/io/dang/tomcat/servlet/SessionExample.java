@@ -55,6 +55,13 @@ public class SessionExample extends HttpServlet {
         out.println("<h3>Session Example</h3>");
 
         HttpSession session = request.getSession(true);
+
+        String invalidate = request.getParameter("invalidate");
+        if (invalidate != null) {
+            session.invalidate();
+            session = request.getSession(true);
+        }
+
         out.println("Session Id " + session.getId());
         out.println("<br>");
         out.println("Session Created ");
@@ -67,6 +74,8 @@ public class SessionExample extends HttpServlet {
         if (dataName != null && dataValue != null) {
             session.setAttribute(dataName, dataValue);
         }
+
+
 
         out.println("<P>");
         out.println("Session Data<br>");
@@ -104,6 +113,15 @@ public class SessionExample extends HttpServlet {
         out.println("<input type=text size=20 name=datavalue>");
         out.println("<br>");
         out.println("<input type=submit>");
+        out.println("</form>");
+
+        out.print("<form action=\"");
+        out.print(response.encodeURL("SessionExample"));
+        out.print("\" ");
+        out.println("method=POST>");
+        out.println("<input type=text hidden=true name=invalidate value=true>");
+        out.println("<br>");
+        out.println("<input type=submit value=Invalidate>");
         out.println("</form>");
 
         out.print("<p><a href=\"");

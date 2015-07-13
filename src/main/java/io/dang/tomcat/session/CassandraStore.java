@@ -202,6 +202,11 @@ public class CassandraStore extends StoreBase {
         // We only need to get rid of the sessions in memory
     }
 
+    /**
+     * Saves the session to the store if valid.
+     * @param session Session to be saved
+     * @throws IOException
+     */
     @Override
     public void save(Session session) throws IOException {
         StandardSession cSession = (StandardSession) session;
@@ -212,8 +217,17 @@ public class CassandraStore extends StoreBase {
             cSession.writeObjectData(oos);
         }
 
+        int idleTime = (int) Math.min(session.getIdleTimeInternal() / 1000L, Integer.MAX_VALUE / 1000);
+        int maxInactiveTime = session.getMaxInactiveInterval();
+        int timeLeft = maxInactiveTime - idleTime;
+
+        if (timeLeft <= 0) {
+            remove(session.getId());
+            return;
+        }
+
         Insert insert = QueryBuilder.insertInto(sessionTableName)
-                .using(QueryBuilder.ttl(session.getMaxInactiveInterval()))
+                .using(QueryBuilder.ttl(timeLeft))
                 .value(sessionIdCol, UUID.fromString(session.getId()))
                 .value(sessionDataCol, ByteBuffer.wrap(baos.toByteArray()))
                 .value(sessionValidCol, cSession.isValid())

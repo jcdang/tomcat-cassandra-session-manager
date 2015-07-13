@@ -18,7 +18,6 @@ public class CassandraClient {
     private Session cassandraSession;
     private String clusterName;
     private String keyspaceName;
-    private String tableName = "sessions";
 
     public CassandraClient(String clusterName, String keyspaceName) {
         this.clusterName = clusterName;

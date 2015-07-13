@@ -1,5 +1,7 @@
 <Context>
-    <Manager className="io.dang.tomcat.session.CassandraManager">
+    <Manager className="io.dang.tomcat.session.CassandraManager"
+             maxIdleBackup="60"
+             maxIdleSwap="60">
 
         <Store className="io.dang.tomcat.session.CassandraStore"
                clusterName="DarwinCluster"
