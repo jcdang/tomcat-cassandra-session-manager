@@ -1,6 +1,5 @@
 package io.dang.tomcat;
 
-import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 
@@ -20,7 +19,7 @@ public class RunTomcat {
         final Tomcat tomcat = new Tomcat();
         tomcat.setPort(TOMCAT_PORT);
         tomcat.setSilent(true);
-        Context context = tomcat.addWebapp("", new File(webAppPath).getAbsolutePath());
+        tomcat.addWebapp("", new File(webAppPath).getAbsolutePath());
         tomcat.start();
 
 
@@ -30,7 +29,7 @@ public class RunTomcat {
             public void run() {
                 try {
                     tomcat.stop();
-                } catch (LifecycleException e) {
+                } catch (LifecycleException ignored) {
                 }
             }
         });

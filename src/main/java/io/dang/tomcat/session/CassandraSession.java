@@ -6,12 +6,17 @@ import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.pool.KryoPool;
 import com.google.common.io.ByteStreams;
 import org.apache.catalina.Manager;
+import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.session.StandardSession;
+import org.apache.catalina.session.StandardSessionFacade;
 
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -49,6 +54,27 @@ public class CassandraSession extends StandardSession {
         if (notify) {
             tellNew();
         }
+    }
+
+    /**
+     * Return the <code>HttpSession</code> for which this object
+     * is the facade.
+     */
+    @Override
+    public HttpSession getSession() {
+
+        if (facade == null){
+            final StandardSession fsession = this;
+
+            if (SecurityUtil.isPackageProtectionEnabled()){
+                facade = AccessController.doPrivileged(
+                        (PrivilegedAction<CassandraSessionFacade>) () -> new CassandraSessionFacade(fsession));
+            } else {
+                facade = new CassandraSessionFacade(fsession);
+            }
+        }
+        return facade;
+
     }
 
 

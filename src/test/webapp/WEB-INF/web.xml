@@ -1,8 +1,18 @@
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
+
+  <servlet>
+    <servlet-name>SessionExample</servlet-name>
+    <servlet-class>io.dang.tomcat.servlet.SessionExample</servlet-class>
+  </servlet>
   <servlet>
     <servlet-name>test-servlet</servlet-name>
     <servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class>
   </servlet>
+
+  <servlet-mapping>
+    <servlet-name>SessionExample</servlet-name>
+    <url-pattern>/SessionExample</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>test-servlet</servlet-name>
     <url-pattern>/*</url-pattern>
