@@ -22,8 +22,6 @@ public class RunTomcat {
         tomcat.addWebapp("", new File(webAppPath).getAbsolutePath());
         tomcat.start();
 
-
-
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {

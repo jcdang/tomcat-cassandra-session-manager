@@ -63,17 +63,21 @@ public class CassandraManager extends PersistentManagerBase {
         }
     }
 
+    /**
+     * Adds only to the active session
+     * @param session
+     */
     @Override
     public void add(Session session) {
         // this will add it to active
         super.add(session);
 
         // this will persist it
-        try {
+/*        try {
             store.save(session);
         } catch (IOException e) {
             log.error("Failed to save session");
-        }
+        }*/
     }
 
     @Override

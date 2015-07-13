@@ -43,13 +43,13 @@ public class CassandraSession extends StandardSession {
     @Override
     public void setId(String id, boolean notify) {
 
-//        if ((this.id != null) && (manager != null))
-//            manager.remove(this);
+        if ((this.id != null) && (manager != null))
+            manager.remove(this);
 
         this.id = id;
 
-//        if (manager != null)
-//            manager.add(this);
+        if (manager != null)
+            manager.add(this);
 
         if (notify) {
             tellNew();

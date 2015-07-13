@@ -41,6 +41,12 @@ public class CassandraSessionFacade extends StandardSessionFacade {
         super.removeAttribute(name);
     }
 
+    @Override
+    public void invalidate() {
+        needToPersist = true;
+        super.invalidate();
+    }
+
     public void resetNeedToPersist() {
         needToPersist = false;
     }
