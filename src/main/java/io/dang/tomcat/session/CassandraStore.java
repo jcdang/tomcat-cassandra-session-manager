@@ -15,6 +15,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.apache.catalina.util.CustomObjectInputStream;
 
@@ -36,6 +37,9 @@ public class CassandraStore extends StoreBase {
     protected String keyspace = "tomcat";
     protected String nodes = "localhost";
     protected int nativePort = 9042;
+
+    protected static String uuidRegex = "/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/";
+    protected static Pattern uuidPattern = Pattern.compile(uuidRegex);
 
 
     final Object clientLock = new Object();
@@ -118,6 +122,13 @@ public class CassandraStore extends StoreBase {
     @Override
     public StandardSession load(String id) throws ClassNotFoundException, IOException {
         StandardSession session = (StandardSession) getManager().createEmptySession();
+        if (id == null) {
+            return null;
+        }
+
+        if (!uuidPattern.matcher(id).matches()) {
+            return null;
+        }
 
         Select select = QueryBuilder.select(sessionIdCol, sessionDataCol)
                 .from(sessionTableName)
